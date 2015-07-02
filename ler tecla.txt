@@ -1,0 +1,46 @@
+.model small
+.8086
+.stack 2048h
+
+dseg    segment
+        Msg_tecla       db      'A tecla premida foi$'
+dseg    ends
+
+cseg    segment para public 'code'
+        assume  cs:cseg, ds:dseg
+
+Main    proc
+        mov   ax, dseg
+        mov   ds, ax
+
+ciclo:
+        mov   ah,0bh            ;funcao que le sem tirar do buffer
+        int   21h
+        cmp   al,0ffh           ;Ve se tem Tecla no Buffer
+        jne   ciclo             ;Enquanto não tem tem tecla no buffer,espera
+        mov   ah,08h            ;Funcao para ler do teclado/buffer
+        int   21h            
+        cmp   al,0              ;Ve se a tecla lida=0 (estendida)
+        jne   tecla_simples     ;Se nao era estendida trata tecla
+        mov   ah,08h            ;sendo estendida volta a ler codigo
+        int   21h
+        
+tecla_simples:
+        PUSH    AX
+        mov     ah,09h
+        lea     dx,Msg_tecla
+        int     21h
+        mov     dl,' '
+        mov     ah,02h
+        int     21h
+        POP     AX
+        mov     dl,al
+        mov     ah,02h
+        int     21h
+
+FIM:
+        MOV     Ah,4CH ;Terminar programa
+        INT     21H
+Main    endp
+cseg    ends
+end     Main

@@ -1,0 +1,74 @@
+.8086
+.MODEL SMALL
+.STACK 2048
+
+DADOS SEGMENT
+        fname   db      'ABC.TXT',0
+        fhandle dw      0
+        buffer  db      'Definicoes de informatica por Murphy:',13,10
+                db      'Software: partes do sistema informatico que nao funcionam.',13,10
+                db      'Perifericos: partes do sistema informatico que sao incompativeis com este.',13,10 
+                db      'Impressora: parte do sistema informatico que avaria assim que se deixa de olhar.',13,10
+                db      'Cabo: parte do sistema informatico que e sempre demasiado curta.',13,10
+                db      'Copia de seguranca: uma operacao que nunca e feita a tempo.',13,10
+                db      'Memoria: parte do sistema informatico que e insuficiente.',13,10
+                db      'Ficheiro: parte do sistema informatico que nunca pode ser encontrada.',13,10
+                db      'Processador: parte do sistema informatico que esta sempre obsoleta.',13,10
+                db      78 dup ('_'),13,10
+                db      78 dup ('_'),13,10
+                db      78 dup ('_'),13,10
+                db      78 dup ('_'),13,10
+                db      78 dup ('_'),13,10
+                db      78 dup ('_'),13,10
+                db      78 dup ('_'),13,10
+                db      78 dup ('_'),13,10
+                db      78 dup ('_'),13,10
+        msgErrorCreate  db      "Ocorreu um erro na criacao do ficheiro!$"
+        msgErrorWrite   db      "Ocorreu um erro na escrita para ficheiro!$"
+        msgErrorClose   db      "Ocorreu um erro no fecho do ficheiro!$"
+DADOS ENDS
+
+
+CODIGO  SEGMENT para    public  'code'
+        ASSUME  CS:CODIGO, DS:DADOS
+Main proc
+        MOV     AX, DADOS
+        MOV     DS, AX
+        
+        mov     ah, 3ch
+        mov     cx, 00H
+        lea     dx, fname
+        int     21h
+        jnc     escreve
+        
+        mov     ah, 09h
+        lea     dx, msgErrorCreate
+        int     21h
+        
+        jmp     fim
+
+escreve:
+        mov     bx, ax
+        mov     ah, 40h
+        lea     dx, buffer
+        mov     cx, 1300
+        int     21h
+        jnc     close
+        
+        mov     ah, 09h
+        lea     dx, msgErrorWrite
+        int     21h
+close:
+        mov     ah,3eh
+        int     21h
+        jnc     fim
+        
+        mov     ah, 09h
+        lea     dx, msgErrorClose
+        int     21h
+fim:
+        MOV     AH,4CH
+        INT     21H
+main    endp
+        CODIGO  ENDS
+END     main
